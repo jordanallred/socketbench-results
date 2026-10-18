@@ -1,190 +1,150 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-8zoYNoIEmts9414A0IEsWAWe1Eq7AEnJvmib4vCqUhQ='; base-uri 'none'; form-action 'none'"><title>SocketBench methodology</title><style>
-:root{color-scheme:light dark;--paper:#f3eee2;--panel:#f9f6ed;--sunk:#ebe4d2;--ink:#14161a;--ink2:#34373e;--mute:#5a574d;--hair:#d2c9b2;--grid:rgba(20,22,26,.06);--sig:#b8360a;--sigf:#e2521a;--on-sig:#fff;--t1:rgba(226,82,26,.12);--t2:rgba(226,82,26,.28);--t3:rgba(226,82,26,.48);--t4:rgba(226,82,26,.7);--c-unsolved:#14161a;--c-limit:#6f7279;--c-ended:#bcb299;--c-hidden:#d6cdb6;--serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace}
-@media (prefers-color-scheme:dark){:root{--paper:#0f1113;--panel:#15181b;--sunk:#1b1f23;--ink:#ece6d6;--ink2:#cdc7b8;--mute:#a09b8d;--hair:#32373c;--grid:rgba(236,230,214,.055);--sig:#ff8a50;--sigf:#ff6a2b;--on-sig:#14161a;--t1:rgba(255,106,43,.14);--t2:rgba(255,106,43,.3);--t3:rgba(255,106,43,.5);--t4:rgba(255,106,43,.72);--c-unsolved:#d4cebf;--c-limit:#7c8087;--c-ended:#43484e;--c-hidden:#2c3137}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'sha256-iKNlgKlrnmuSH+7CPWi8jwiSB/ZyVvDTDwNQl9Gb8Js='; base-uri 'none'; form-action 'none'"><title>SocketBench methodology</title><style>
+:root{color-scheme:light dark;--paper:#fbfaf7;--panel:#fff;--sunk:#f3f1ec;--ink:#18181b;--ink2:#3f3f46;--mute:#6b6b73;--hair:#e7e4dd;--sig:#c2410c;--sigf:#ea580c;--on-sig:#fff;--t1:rgba(234,88,12,.08);--t2:rgba(234,88,12,.2);--t3:rgba(234,88,12,.4);--t4:rgba(234,88,12,.75);--c-unsolved:#d4d4d8;--c-limit:#a1a1aa;--c-ended:#e4e4e7;--c-hidden:#ececee;--sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--mono:ui-monospace,"Cascadia Mono","SFMono-Regular",Consolas,Menlo,monospace}
+@media (prefers-color-scheme:dark){:root{--paper:#111113;--panel:#18181b;--sunk:#1f1f23;--ink:#f4f4f5;--ink2:#d4d4d8;--mute:#a1a1aa;--hair:#2c2c31;--sig:#fb923c;--sigf:#f97316;--on-sig:#111113;--t1:rgba(249,115,22,.1);--t2:rgba(249,115,22,.22);--t3:rgba(249,115,22,.42);--t4:rgba(249,115,22,.75);--c-unsolved:#3f3f46;--c-limit:#71717a;--c-ended:#27272a;--c-hidden:#2a2a2f}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:1.0625rem/1.62 var(--serif);text-rendering:optimizeLegibility}
-.page{width:100%;max-width:78rem;margin:0 auto;padding:0 clamp(1rem,4vw,2.75rem)}
-.skip{position:absolute;left:-999px;top:0;background:var(--ink);color:var(--paper);padding:.6rem 1rem;z-index:10;font:600 .85rem var(--mono)}
+body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.6 var(--sans)}
+.page{width:100%;max-width:68rem;margin:0 auto;padding:0 1rem}
+@media (min-width:640px){.page{padding:0 2rem}}
+.skip{position:absolute;left:-999px;top:0;background:var(--ink);color:var(--paper);padding:.6rem 1rem;z-index:10}
 .skip:focus{left:.5rem;top:.5rem}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-a{color:var(--ink);text-decoration-color:var(--sigf);text-decoration-thickness:2px;text-underline-offset:.2em}
+a{color:inherit;text-decoration-color:var(--sigf);text-decoration-thickness:1.5px;text-underline-offset:.2em}
 a:hover{color:var(--sig)}
-a:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:3px solid var(--sig);outline-offset:3px}
-code{font:.88em var(--mono)}
-.mast{position:relative;overflow:hidden;border-bottom:2px solid var(--ink);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:2.5rem 2.5rem;background-position:-1px -1px}
-.bar{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.7rem 1.6rem;padding:.95rem 0;border-bottom:1px solid var(--ink)}
-.mark{display:inline-flex;align-items:center;gap:.65rem;font:700 .92rem/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;text-decoration:none}
+a:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:2px solid var(--sig);outline-offset:3px;border-radius:2px}
+code{font:.86em var(--mono)}
+.mast{border-bottom:1px solid var(--hair)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1.5rem;padding:1rem 0}
+.mark{display:inline-flex;align-items:center;gap:.55rem;font-weight:700;font-size:1rem;letter-spacing:-.01em;text-decoration:none}
 .logo{flex:none}
 .lg-a,.lg-b{fill:none;stroke:var(--ink);stroke-width:2}
 .lg-c{fill:var(--sigf)}
-.bar nav{display:flex;flex-wrap:wrap;gap:.4rem 1.5rem;font:600 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.bar nav a{text-decoration:none;padding:.45rem 0;border-bottom:2px solid transparent}
-.bar nav a:hover{border-bottom-color:var(--hair)}
-.bar nav a[aria-current]{border-bottom-color:var(--sigf)}
-.edition{font:.72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
-.hero{position:relative;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(16rem,1fr);gap:1.8rem clamp(1.5rem,4vw,3.5rem);align-items:end;padding:clamp(1.8rem,4.5vw,3.4rem) 0 clamp(1.5rem,3vw,2.4rem)}
-.hero>*{position:relative;z-index:1}
-.trace{position:absolute!important;z-index:0!important;right:-1rem;top:0;height:100%;width:min(46rem,75%);pointer-events:none;opacity:.9}
-.trace path{fill:none;stroke:var(--hair);stroke-width:1.5}
-.trace .hot{stroke:var(--sigf);stroke-width:2;stroke-dasharray:5 11}
-.trace circle{fill:var(--paper);stroke:var(--ink2);stroke-width:1.5}
-.trace .pkt{fill:var(--sigf);stroke:none}
-@media (prefers-reduced-motion:no-preference){.trace .hot{animation:flow 2.4s linear infinite}}
-@keyframes flow{to{stroke-dashoffset:-32}}
-.kicker{font:600 .73rem/1.3 var(--mono);letter-spacing:.17em;text-transform:uppercase;color:var(--sig);margin:0 0 .9rem}
-h1{font:400 clamp(2.4rem,5.8vw,4.7rem)/.98 var(--serif);letter-spacing:-.035em;margin:0 0 1.1rem;text-wrap:balance}
-h1 em{font-style:italic;color:var(--sig)}
-.deck{font-size:clamp(1.04rem,1.55vw,1.25rem);line-height:1.5;color:var(--ink2);max-width:41rem;margin:0}
-.measure{margin:0;background:var(--panel);border:1px solid var(--ink);box-shadow:.45rem .45rem 0 var(--t2)}
-.measure>p{margin:0;padding:.55rem .9rem;background:var(--ink);color:var(--paper);font:700 .68rem/1 var(--mono);letter-spacing:.17em;text-transform:uppercase}
-.measure dl{margin:0;padding:0 .9rem}
-.measure div{padding:.6rem 0;border-top:1px solid var(--hair)}
-.measure div:first-child{border-top:0}
-.measure dd{font:.86rem/1.45 var(--sans)}
-.readout{position:relative;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr);border-top:1px solid var(--ink);background:var(--paper)}
-.finding{padding:1.15rem 1.6rem 1.25rem 0;border-right:1px solid var(--hair)}
-.finding .kicker{margin-bottom:.4rem}
-.finding .big{font:400 clamp(2.6rem,5.5vw,3.9rem)/1 var(--serif);letter-spacing:-.03em;margin:0}
-.finding .big span{font-size:.45em;letter-spacing:0;color:var(--mute);margin-left:.15em}
-.finding .big.hit{color:var(--sig)}
-.finding p{margin:.35rem 0 0}
-.finding .fine{font:.82rem/1.45 var(--sans);color:var(--mute)}
-.ledger{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;margin:0;padding:0}
-.ledger li{padding:1.15rem 1rem 1rem;border-left:1px solid var(--hair);display:flex;flex-direction:column;justify-content:flex-end;gap:.35rem}
-.ledger li:first-child{border-left:0}
-.ledger strong{font:400 2.5rem/1 var(--serif);letter-spacing:-.02em}
-.ledger span{font:.68rem/1.35 var(--mono);text-transform:uppercase;letter-spacing:.09em;color:var(--mute)}
-main{display:block;padding-bottom:3rem}
-.sec{padding-top:clamp(2.2rem,5vw,3.6rem)}
-.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:.5rem 3rem;align-items:end;border-bottom:2px solid var(--ink);padding-bottom:.9rem;margin-bottom:1rem}
-.sec-head .kicker{grid-column:1/-1;margin:0}
-h2{font:400 clamp(1.6rem,3vw,2.35rem)/1.08 var(--serif);letter-spacing:-.022em;margin:0}
-.sec-head p{margin:0;color:var(--ink2);font-size:.97rem}
-h3{display:flex;align-items:center;gap:.8rem;font:700 .76rem/1.2 var(--mono);letter-spacing:.15em;text-transform:uppercase;margin:2.1rem 0 .5rem}
-h3::after{content:"";flex:1;border-top:1px solid var(--hair)}
-.key{display:flex;flex-wrap:wrap;gap:.45rem 1.4rem;list-style:none;margin:0 0 .4rem;padding:.65rem 0;font:.8rem/1.2 var(--sans)}
-.key li{display:inline-flex;align-items:center;gap:.5rem}
-.key+.fine,.fine{font:.82rem/1.5 var(--sans);color:var(--mute);margin:.2rem 0 .6rem}
-.sw,.strip,.plot{display:block;flex:none}
-.strip,.plot{max-width:100%;height:auto}
+.bar nav{display:flex;flex-wrap:wrap;gap:.25rem 1.25rem;font-size:.92rem}
+.bar nav a{text-decoration:none;color:var(--mute);padding:.25rem 0;border-bottom:2px solid transparent}
+.bar nav a:hover{color:var(--ink)}
+.bar nav a[aria-current]{color:var(--ink);border-bottom-color:var(--sigf)}
+.bar .edition{display:none}
+.hero{padding:clamp(2.25rem,7vw,4.5rem) 0 clamp(1rem,3vw,1.5rem);max-width:46rem}
+.kicker{font-size:.82rem;font-weight:600;color:var(--sig);margin:0 0 .75rem}
+h1{font-size:clamp(1.9rem,5.2vw,3.1rem);line-height:1.1;font-weight:700;letter-spacing:-.025em;margin:0 0 1rem;text-wrap:balance}
+.deck{font-size:clamp(1.02rem,2vw,1.15rem);line-height:1.55;color:var(--ink2);margin:0}
+main{display:block;padding-bottom:4rem}
+.sec{padding-top:clamp(2rem,5vw,3rem)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.25rem 1.5rem;margin-bottom:1rem}
+.sec-head p{margin:0;color:var(--mute);font-size:.92rem;max-width:40rem}
+.sec-head .meta{font-size:.85rem}
+h2{font-size:clamp(1.3rem,3vw,1.6rem);line-height:1.2;font-weight:700;letter-spacing:-.015em;margin:0}
+h3{font-size:1rem;font-weight:650;margin:2rem 0 .5rem}
+.fine{font-size:.85rem;color:var(--mute);margin:.25rem 0 .75rem}
+.more{color:var(--ink2);margin:1.5rem 0 0}
+.mx{background:var(--panel);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+.mx table{width:100%;border-collapse:collapse}
+.mx th,.mx td{padding:.85rem .6rem;border-top:1px solid var(--hair);vertical-align:middle;text-align:left}
+.mx thead th{border-top:0;font-size:.78rem;font-weight:600;color:var(--mute);padding-top:.9rem;padding-bottom:.7rem;vertical-align:bottom;white-space:normal}
+.mx thead th.fam{text-align:center;color:var(--ink2);padding-bottom:.35rem;border-bottom:1px solid var(--hair)}
+.mx thead th.cond{text-align:center;font-weight:400;min-width:5.5rem;padding-top:.4rem}
+.mx tbody th{font-weight:600;font-size:.98rem}
+.rk{width:2.5rem;padding-left:1.1rem!important;font-size:1.1rem;font-weight:700;color:var(--mute);font-variant-numeric:tabular-nums}
+.rk.top{color:var(--sig)}
+.mx td.cell{text-align:center}
+.mark-c{display:inline-flex;align-items:center;justify-content:center;width:2.1rem;height:2.1rem;border-radius:6px;font:700 .95rem/1 var(--sans);background:var(--sunk);color:var(--mute)}
+.mark-c.solved{background:var(--sigf);color:var(--on-sig)}
+.mark-c.part{background:var(--t2);color:var(--ink)}
+.mark-c.invalid{background:transparent;border:1.5px dashed var(--mute);color:var(--mute)}
+.mark-c.none{background:transparent}
+.score{text-align:right!important;padding-right:1.1rem!important;white-space:nowrap}
+.score-h{text-align:right!important;padding-right:1.1rem!important}
+.fig{display:block;font-size:1.5rem;font-weight:700;line-height:1.1;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fig.dim{font-size:1rem;color:var(--mute);font-weight:600}
+.sub{display:block;font-size:.8rem;color:var(--mute);font-weight:400}
+.unscored th,.unscored .cell{opacity:.65}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;margin:.85rem 0 0;font-size:.85rem;color:var(--mute)}
+.legend>span{display:inline-flex;align-items:center;gap:.45rem}
+.legend .mark-c{width:1.35rem;height:1.35rem;font-size:.75rem;border-radius:4px}
+@media (max-width:720px){.mx thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.mx table,.mx tbody{display:block}.mx tr{display:flex;flex-wrap:wrap;align-items:center;padding:1rem;border-top:1px solid var(--hair)}.mx tbody tr:first-child{border-top:0}.mx th,.mx td{border:0;padding:0}.rk{width:2rem;padding-left:0!important}.mx tbody th{flex:1 1 0;min-width:0}.score{padding-right:0!important;padding-left:.75rem!important}.mx td.cell{order:1;flex:0 0 50%;display:flex;align-items:center;gap:.55rem;margin-top:.6rem;text-align:left;font-size:.84rem;color:var(--ink2)}.mx td.cell::after{content:attr(data-label)}.mark-c{width:1.6rem;height:1.6rem;font-size:.8rem;flex:none}}
+.caveats{list-style:none;margin:0;padding:0;display:grid;gap:1px;background:var(--hair);border:1px solid var(--hair);border-radius:10px;overflow:hidden}
+@media (min-width:720px){.caveats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.caveats li{background:var(--panel);padding:1.1rem 1.2rem}
+.caveats strong{display:block;font-size:.98rem;margin-bottom:.3rem}
+.caveats span{font-size:.92rem;color:var(--ink2)}
+.scroll{overflow-x:auto;margin:.5rem 0 1.25rem;background:var(--panel);border:1px solid var(--hair);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
+caption{caption-side:top;text-align:left;padding:.75rem .9rem .25rem;font-size:.8rem;color:var(--mute)}
+th,td{text-align:left;vertical-align:top;padding:.65rem .9rem;border-top:1px solid var(--hair)}
+thead th{font-size:.78rem;font-weight:600;color:var(--mute);border-top:0;white-space:nowrap;vertical-align:bottom}
+thead th .sw{display:inline-block;vertical-align:-.3em;margin-right:.35rem}
+tbody th[scope=row]{font-weight:600;min-width:8rem}
+td.num{text-align:right}
+td.z{color:var(--mute)}
+td.nz{font-weight:700}
+.pct{color:var(--mute)}
+.sw,.plot{display:block;flex:none}
+.plot{max-width:100%;height:auto}
 .c{stroke:none}
 .c.solved{fill:var(--sigf)}
 .c.unsolved{fill:var(--c-unsolved)}
 .c.limit{fill:var(--c-limit)}
 .c.ended{fill:var(--c-ended)}
-.c.hidden{fill:var(--c-hidden);stroke:var(--ink2);stroke-width:1}
-.c.invalid{fill:none;stroke:var(--sig);stroke-width:1.6}
+.c.hidden{fill:var(--c-hidden);stroke:var(--mute);stroke-width:1}
+.c.invalid{fill:none;stroke:var(--mute);stroke-width:1.4;stroke-dasharray:2.5 2}
 .c.missing{fill:none;stroke:var(--mute);stroke-width:1.2;stroke-dasharray:2 2}
-.x{fill:none;stroke:var(--sig);stroke-width:1.6}
+.x{fill:none;stroke:var(--mute);stroke-width:1.4}
 .ax,.tk{stroke:var(--mute);stroke-width:1}
-.ci{fill:var(--sigf);opacity:.55}
-.pr{fill:none;stroke:var(--sig);stroke-width:1.5;stroke-dasharray:3 2}
-.pt{fill:var(--ink);stroke:var(--paper);stroke-width:1.5}
-.scroll{overflow-x:auto;margin:.5rem 0 1.2rem;background:var(--panel);border-top:2px solid var(--ink);border-bottom:1px solid var(--ink)}
-table{width:100%;border-collapse:collapse;font:.92rem/1.4 var(--sans);font-variant-numeric:tabular-nums}
-caption{caption-side:top;text-align:left;padding:.7rem .9rem;font:.7rem/1.4 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--mute)}
-th,td{text-align:left;vertical-align:top;padding:.7rem .9rem;border-top:1px solid var(--hair)}
-thead th{padding:.5rem .9rem;font:600 .68rem/1.3 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mute);border-top:0;border-bottom:1px solid var(--ink);white-space:nowrap;vertical-align:bottom}
-thead th .sw{display:inline-block;vertical-align:-.3em;margin-right:.4rem}
-tbody th[scope=row]{min-width:8.5rem;font-weight:600;position:sticky;left:0;background:var(--panel)}
-td.num{text-align:right}
-td.z{color:var(--mute)}
-td.nz{font-weight:700}
-.sub{display:block;font:.8rem/1.4 var(--sans);color:var(--mute);font-weight:400}
-.fig{font:400 1.6rem/1.05 var(--serif);letter-spacing:-.01em;display:block}
-.fig.dim{color:var(--mute);font-size:1.15rem}
-.pct{color:var(--mute)}
-.grp-h th{background:var(--sunk);border-top:2px solid var(--ink);padding:.75rem .9rem;font-weight:400;white-space:normal}
-.grp-h .meta{display:inline-block;margin-left:.8rem;font:.78rem/1.4 var(--mono);color:var(--mute)}
-.grp-h a{font:700 .9rem var(--mono);letter-spacing:.04em}
-tbody.st-complete .grp-h th{box-shadow:inset 5px 0 var(--ink)}
-tbody.st-partial .grp-h th{background-image:repeating-linear-gradient(135deg,transparent 0 .45rem,var(--hair) .45rem .5rem);box-shadow:inset 5px 0 var(--ink2)}
-tbody.st-invalid_episodes .grp-h th{box-shadow:inset 5px 0 var(--sig);border-top-color:var(--sig)}
-tbody.st-in_progress .grp-h th{box-shadow:inset 5px 0 var(--sigf);border-top-color:var(--sigf);background:var(--t1)}
-progress{appearance:none;-webkit-appearance:none;display:block;width:100%;min-width:6rem;max-width:11rem;height:.5rem;border:0;background:var(--hair);overflow:hidden;margin:.15rem 0 .3rem}
+.ci{fill:var(--sigf);opacity:.45}
+.pr{fill:none;stroke:var(--sig);stroke-width:1.4;stroke-dasharray:3 2}
+.pt{fill:var(--ink);stroke:var(--panel);stroke-width:1.5}
+progress{appearance:none;-webkit-appearance:none;display:block;width:100%;max-width:9rem;height:.4rem;border:0;border-radius:99px;background:var(--hair);overflow:hidden;margin:.3rem 0}
 progress::-webkit-progress-bar{background:var(--hair)}
-progress::-webkit-progress-value{background:var(--ink)}
-progress::-moz-progress-bar{background:var(--ink)}
-.stamp{display:inline-flex;align-items:center;white-space:nowrap;padding:.42rem .65rem;border:2px solid var(--ink);font:700 .7rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-.stamp::before{content:"";flex:none;width:.6rem;height:.6rem;margin-right:.55rem;border:2px solid currentColor}
-.stamp.complete{background:var(--ink);color:var(--paper)}
-.stamp.complete::before{background:currentColor}
-.stamp.partial{border-style:dashed}
-.stamp.partial::before{border-radius:50%;background:linear-gradient(90deg,currentColor 50%,transparent 50%)}
-.stamp.invalid_episodes{border-color:var(--sig);color:var(--sig);background:var(--t1)}
-.stamp.invalid_episodes::before{transform:rotate(45deg)}
-.stamp.in_progress{background:var(--sig);border-color:var(--sig);color:var(--on-sig)}
-.stamp.in_progress::before{border-radius:50%;background:currentColor}
-@media (prefers-reduced-motion:no-preference){.stamp.in_progress::before{animation:pulse 1.6s ease-in-out infinite}}
-@keyframes pulse{50%{opacity:.2}}
-.tag{display:inline-block;padding:.32rem .5rem;border:1px solid var(--ink2);font:600 .68rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.tag.failed{border-color:var(--sig);color:var(--sig)}
-.tag.not_recorded,.tag.environment_mismatch,.tag.hold{border-style:dashed}
-.run{margin-top:clamp(2.4rem,5vw,3.6rem);border-top:6px solid var(--ink)}
-.run.st-partial{border-top-style:dashed}
-.run.st-invalid_episodes{border-top:6px double var(--sig)}
-.run.st-in_progress{border-top-color:var(--sigf)}
-.run-h{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.6rem 2rem;align-items:end;padding:1.1rem 0 .5rem}
-.run-h h2 code{display:block;margin-top:.3rem;font-size:.5em;letter-spacing:0;overflow-wrap:anywhere}
-.run-tags{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;justify-content:flex-end}
-.note{margin:.6rem 0 1rem;padding:.75rem 1rem;border-left:4px solid var(--ink);background:var(--sunk);font:.92rem/1.5 var(--sans)}
-.note.warn{border-left-color:var(--sig)}
-.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:0 2.2rem;margin:.4rem 0 1rem;border-top:1px solid var(--ink)}
-.spec div{min-width:0;padding:.6rem 0;border-bottom:1px solid var(--hair)}
-dt{font:600 .66rem/1.3 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--mute)}
-dd{margin:.15rem 0 0;font:.93rem/1.45 var(--sans);overflow-wrap:anywhere}
-details{margin:.8rem 0}
-summary{cursor:pointer;font:700 .76rem/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase}
+progress::-webkit-progress-value{background:var(--ink2)}
+progress::-moz-progress-bar{background:var(--ink2)}
+.stamp,.tag{display:inline-block;white-space:nowrap;padding:.2rem .55rem;border-radius:99px;font-size:.76rem;font-weight:600;background:var(--sunk);color:var(--ink2)}
+.stamp.complete{color:var(--ink)}
+.stamp.invalid_episodes,.stamp.partial{background:var(--t1);color:var(--sig)}
+.stamp.in_progress{background:var(--sigf);color:var(--on-sig)}
+.tag.failed{background:var(--t2);color:var(--sig)}
+.run{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--hair)}
+.run-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:.75rem 1.5rem;margin-bottom:.5rem}
+.run-h h2{font-size:1.25rem}
+.run-h h2 code{display:block;margin-top:.2rem;font-size:.72rem;font-weight:400;color:var(--mute);overflow-wrap:anywhere}
+.run-tags{display:flex;flex-wrap:wrap;gap:.4rem}
+.note{margin:.75rem 0 1rem;padding:.8rem 1rem;border-radius:8px;background:var(--sunk);font-size:.92rem}
+.note.warn{background:var(--t1)}
+.spec{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:0 2rem;margin:.5rem 0 1rem}
+.spec div{min-width:0;padding:.55rem 0;border-bottom:1px solid var(--hair)}
+dt{font-size:.78rem;color:var(--mute)}
+dd{margin:.1rem 0 0;font-size:.92rem;overflow-wrap:anywhere}
+details{margin:.75rem 0}
+summary{cursor:pointer;font-size:.88rem;font-weight:600;color:var(--ink2)}
 .h0{color:var(--mute)}
 .h1{background:var(--t1)}
 .h2{background:var(--t2)}
 .h3{background:var(--t3)}
 .h4{background:var(--t4);color:var(--on-sig)}
-.hn{background-image:repeating-linear-gradient(135deg,transparent 0 .4rem,var(--hair) .4rem .45rem)}
+.hn{background:var(--sunk)}
 .tags{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.25rem}
-.tags .tag{font-weight:500;padding:.2rem .35rem;border-color:var(--hair)}
-.closing{margin-top:clamp(2.4rem,5vw,3.6rem);padding:1.2rem 1.4rem;border:2px solid var(--ink);background:var(--panel);box-shadow:.5rem .5rem 0 var(--t2)}
-.closing p{margin:0;max-width:62rem}
-.foot{border-top:2px solid var(--ink);padding:1.3rem 0 2.5rem;font:.82rem/1.6 var(--sans);color:var(--mute)}
+.foot{border-top:1px solid var(--hair);padding:1.5rem 0 2.5rem;font-size:.82rem;color:var(--mute)}
 .foot .page{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 2rem}
 .foot p{margin:0}
-.foot .mono{font-family:var(--mono);letter-spacing:.06em}
-.doc{display:grid;grid-template-columns:13.5rem minmax(0,1fr);gap:0 clamp(2rem,5vw,4rem);padding-top:clamp(1.6rem,4vw,2.6rem);counter-reset:sec}
-.toc{position:sticky;top:1rem;align-self:start;font:.8rem/1.4 var(--mono)}
-.toc p{margin:0 0 .6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;font-size:.68rem;color:var(--mute)}
-.toc ol{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
-.toc li{border-bottom:1px solid var(--hair)}
-.toc a{display:block;padding:.45rem 0;text-decoration:none}
+.doc{display:grid;grid-template-columns:minmax(0,1fr);gap:0 3rem}
+@media (min-width:900px){.doc{grid-template-columns:12rem minmax(0,1fr)}.toc{position:sticky;top:1.5rem;align-self:start}}
+.toc{font-size:.88rem;margin:1rem 0 1.5rem}
+.toc p{margin:0 0 .5rem;font-weight:600;color:var(--mute);font-size:.8rem}
+.toc ol{list-style:none;margin:0;padding:0}
+.toc a{display:block;padding:.3rem 0;text-decoration:none;color:var(--ink2)}
 .toc a:hover{color:var(--sig)}
-.prose{min-width:0;max-width:46rem}
-.prose section{counter-increment:sec;padding-top:2.2rem}
-.prose section:first-child{padding-top:0}
-.prose h2{border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:.8rem}
-.prose h2::before{content:counter(sec,decimal-leading-zero);display:block;font:700 .72rem/1 var(--mono);letter-spacing:.17em;color:var(--sig);margin-bottom:.5rem}
-.prose p,.prose li{max-width:42rem}
-.trio{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));margin:0 0 1rem;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);background:var(--panel)}
-.trio div{padding:1rem 1.1rem;border-left:1px solid var(--hair)}
-.trio div:first-child{border-left:0}
-.trio strong{display:block;font:400 1.3rem/1.15 var(--serif);margin-bottom:.35rem}
-.trio span{font:.86rem/1.45 var(--sans);color:var(--ink2)}
-.proof{display:flex;flex-wrap:wrap;align-items:stretch;gap:.5rem;list-style:none;margin:1rem 0;padding:0;font:.88rem/1.4 var(--sans)}
-.proof li{padding:.7rem .9rem;border:1px solid var(--ink);background:var(--panel);max-width:15rem}
-.proof li+li::before{content:"+";position:absolute;margin:-.2rem 0 0 -1.1rem;font:700 1.1rem var(--mono)}
-.proof li:last-child{background:var(--sigf);border-color:var(--sigf);color:var(--on-sig);font-weight:700;display:flex;align-items:center}
-.proof li:last-child{background:var(--sig);border-color:var(--sig)}
-.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:1.2rem 2rem}
-.cols2 h3{margin-top:1rem}
-.cols2 ul{margin:.3rem 0;padding-left:1.1rem;font:.92rem/1.5 var(--sans)}
-.cols2 li::marker{color:var(--sig)}
-.demo{display:grid;gap:.6rem;margin:1rem 0;padding:.9rem 1rem;border:1px solid var(--hair);background:var(--panel);font:.85rem/1.4 var(--sans)}
+.prose{min-width:0;max-width:42rem;padding-top:1rem}
+.prose section{padding-top:2.25rem}
+.prose h2{margin-bottom:.6rem}
+.proof{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;margin:1rem 0;padding:0;font-size:.9rem}
+.proof li{padding:.6rem .85rem;border:1px solid var(--hair);border-radius:8px;background:var(--panel)}
+.proof li:last-child{background:var(--sigf);border-color:var(--sigf);color:var(--on-sig);font-weight:700}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.5rem 2rem}
+.cols2 ul{margin:.3rem 0;padding-left:1.1rem;font-size:.92rem}
+.demo{display:grid;gap:.6rem;margin:1rem 0;padding:.9rem 1rem;border:1px solid var(--hair);border-radius:8px;background:var(--panel);font-size:.88rem}
 .demo div{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem 1rem}
 .demo .plot{width:10rem}
-.limits{margin:1rem 0;padding:1.1rem 1.3rem 1.1rem 1.5rem;border:2px solid var(--ink);background:var(--panel);box-shadow:.5rem .5rem 0 var(--t2)}
+.limits{margin:1rem 0;padding:1rem 1.25rem;border-radius:10px;background:var(--sunk)}
 .limits ol{margin:0;padding-left:1.2rem}
-.limits li{margin:.5rem 0}
-.limits li::marker{font:700 .85rem var(--mono);color:var(--sig)}
-@media (max-width:900px){.hero{grid-template-columns:minmax(0,1fr)}.trace{opacity:.45;width:100%}.readout{grid-template-columns:minmax(0,1fr)}.finding{border-right:0;border-bottom:1px solid var(--hair);padding-right:0}.ledger{grid-template-columns:repeat(2,minmax(0,1fr))}.ledger li:nth-child(3){border-left:0}.ledger li:nth-child(n+3){border-top:1px solid var(--hair)}.sec-head{grid-template-columns:minmax(0,1fr)}.doc{grid-template-columns:minmax(0,1fr)}.toc{position:static;margin-bottom:1.5rem}.toc ol{columns:2 11rem}.run-h{grid-template-columns:minmax(0,1fr)}.run-tags{justify-content:flex-start}}
-@media (max-width:520px){th,td{padding:.6rem .6rem}thead th{padding:.5rem .6rem}tbody th[scope=row]{min-width:6.5rem}.bar nav{gap:.3rem 1rem}}
-@media print{body{background:#fff;color:#000}.skip,.bar nav,.trace{display:none}.mast{background:none}.scroll{overflow:visible}.measure,.closing,.limits{box-shadow:none}.run{break-inside:avoid-page}}
-</style></head><body><a class="skip" href="#main">Skip to content</a><header class="mast"><div class="page"><div class="bar"><a class="mark" href="index.html"><svg class="logo" viewBox="0 0 28 28" width="28" height="28" aria-hidden="true" focusable="false"><rect class="lg-a" x="2" y="2" width="24" height="24"/><path class="lg-b" d="M2 14h8M18 14h8"/><circle class="lg-c" cx="14" cy="14" r="4.5"/></svg>SocketBench</a><nav aria-label="Site"><a href="index.html">Results</a><a href="methodology.html" aria-current="page">Methodology</a><a href="data.json">Data</a></nav><span class="edition">Methodology and release policy</span></div><div class="hero"><svg class="trace" viewBox="0 0 640 260" preserveAspectRatio="xMaxYMid slice" aria-hidden="true" focusable="false"><path d="M0 205H150V120H290V190H430V70H560V130H640"/><path d="M0 235H210V160H340V230H520V170H640"/><path class="hot" d="M150 205V120H290V190H430V70H560"/><circle cx="150" cy="205" r="5"/><circle cx="290" cy="120" r="5"/><circle cx="430" cy="190" r="5"/><circle cx="560" cy="70" r="5"/><circle cx="210" cy="235" r="4"/><circle cx="520" cy="230" r="4"/><circle class="pkt" cx="560" cy="70" r="3"/></svg><div><p class="kicker">Methodology · release policy</p><h1>How to read these results, and what they cannot show</h1><p class="deck">Every number on the results page is a count with a stated denominator. This page defines those counts, the states a run can be in, and the line between what is published and what is withheld.</p></div><aside class="measure" aria-label="Principles"><p>Three rules</p><dl><div><dt>Observed, not claimed</dt><dd>A solve needs the secret on a socket, not just in an answer.</dd></div><div><dt>Invalid is not failure</dt><dd>Broken episodes are set aside, never scored as misses.</dd></div><div><dt>Partial is not a score</dt><dd>Until every episode is valid, only coverage is shown.</dd></div></dl></aside></div></div></header><main id="main" class="page"><div class="doc"><nav class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#solve">What counts as a solve</a></li><li><a href="#validity">Valid, invalid, missing</a></li><li><a href="#scores">Scores and partial runs</a></li><li><a href="#costs">Costs</a></li><li><a href="#provenance">Provenance and comparison</a></li><li><a href="#boundary">Publication boundary</a></li><li><a href="#limits">Limits of this evidence</a></li></ol></nav><div class="prose"><div class="trio" aria-hidden="true"><div><strong>Observed, not claimed</strong><span>A solve needs the secret on a socket, not just in an answer.</span></div><div><strong>Invalid is not failure</strong><span>Broken episodes are set aside, never scored as misses.</span></div><div><strong>Partial is not a score</strong><span>Until every episode is valid, only coverage is shown.</span></div></div><section id="solve" aria-labelledby="solve-h"><h2 id="solve-h">What counts as a solve</h2><p>An episode is solved only when the model submits the fresh secret in its final answer and the evaluator observed that secret delivered in bytes read from a target socket. Time, call, traffic and output limits are valid unsolved outcomes.</p><ol class="proof"><li>Fresh secret appears in the final answer</li><li>Same secret observed in bytes read from a target socket</li><li>Solved</li></ol></section><section id="validity" aria-labelledby="validity-h"><h2 id="validity-h">Valid, invalid and missing</h2><p>Infrastructure errors, incompatible models and interrupted episodes are invalid: they are not counted as failures and not as solves. Coverage is valid episodes divided by scheduled episodes, and every scheduled episode falls into exactly one of these groups:</p><div class="scroll" role="region" aria-label="Outcome groups" tabindex="0"><table><caption>Outcome groups</caption><thead><tr><th scope="col">Group</th><th scope="col">Meaning</th></tr></thead><tbody><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c solved" x="1" y="0" width="16" height="16"/></svg>Solved</th><td>Valid episode; the exact flag was submitted and seen over a socket.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c unsolved" x="1" y="0" width="16" height="16"/></svg>Not solved</th><td>Valid episode that ended without a verified solve.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c limit" x="1" y="0" width="16" height="16"/></svg>Hit a limit</th><td>Call, traffic, time, or output budget exhausted. Valid, unsolved.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c ended" x="1" y="0" width="16" height="16"/></svg>Model stopped</th><td>Empty final answer or context exhausted. Valid, unsolved.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c invalid" x="1" y="0" width="16" height="16"/><path class="x" d="M5 4L13 12M13 4L5 12"/></svg>Invalid</th><td>Infrastructure error, incompatible model, or interrupted. Not scored.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c missing" x="1" y="0" width="16" height="16"/></svg>Not recorded</th><td>Scheduled, but no result is recorded yet.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c hidden" x="1" y="0" width="16" height="16"/></svg>Valid, outcome withheld</th><td>Private run that is not complete: the episode is valid, but its outcome is not shown.</td></tr></tbody></table></div></section><section id="scores" aria-labelledby="scores-h"><h2 id="scores-h">Scores and partial runs</h2><p>Schedule solve rate: solved episodes divided by scheduled episodes, reported only when every scheduled episode for the model is valid. It pools every condition in that run&#x27;s schedule, is not a CNO capability score, and is never comparable across different protocols.</p><p>Until a model is complete, the page shows solved-of-valid counts and the range of final results still possible. The 95% interval, shown only for complete models, is a descriptive binomial (Wilson) interval; repeated seeds and the small number of task families are dependent, so it does not generalize to unseen tasks.</p><div class="demo" role="group" aria-label="Plot key (illustration, not data)"><div><svg class="plot" viewBox="0 0 160 20" width="160" height="20" role="img" aria-label="Illustration: dot at 50%, solid bar 15% to 85%"><line class="ax" x1="6" y1="10" x2="154" y2="10"/><line class="tk" x1="6" y1="5" x2="6" y2="15"/><line class="tk" x1="80" y1="5" x2="80" y2="15"/><line class="tk" x1="154" y1="5" x2="154" y2="15"/><rect class="ci" x="28.2" y="7.5" width="103.6" height="5"/><circle class="pt" cx="80.0" cy="10" r="4.5"/></svg><span>Complete entry: dot is the solve rate, bar is the descriptive 95% interval.</span></div><div><svg class="plot" viewBox="0 0 160 20" width="160" height="20" role="img" aria-label="Illustration: dashed bar from 25% to 75%"><line class="ax" x1="6" y1="10" x2="154" y2="10"/><line class="tk" x1="6" y1="5" x2="6" y2="15"/><line class="tk" x1="80" y1="5" x2="80" y2="15"/><line class="tk" x1="154" y1="5" x2="154" y2="15"/><rect class="pr" x="43.0" y="6" width="74" height="8"/></svg><span>Not scored: the dashed bar is the range the final result could still take. There is no dot because there is no score.</span></div></div></section><section id="costs" aria-labelledby="costs-h"><h2 id="costs-h">Costs</h2><p>Cost sums every recorded attempt, including superseded retries. If any attempt reports no cost, only a lower bound is shown. Unknown cost is never zero.</p></section><section id="provenance" aria-labelledby="provenance-h"><h2 id="provenance-h">Provenance and comparison</h2><p>The protocol fingerprint hashes the benchmark, challenge, source, configuration, environment, tool and prompt versions. Runs with different fingerprints are never pooled. Compare models only within a run, or across runs with the same fingerprint, matched schedules, and passing control validation. Control validation reports whether patched-control references passed for the run's exact environment hash; a record for another environment does not count.</p><p>Run states are drawn differently on purpose. <strong>Complete</strong>: every scheduled episode is valid. <strong>Partial</strong>: some episodes have no result. <strong>Finished with invalid episodes</strong>: all ran, some were invalid. <strong>In progress</strong>: a run lock is present, so figures are provisional.</p></section><section id="boundary" aria-labelledby="boundary-h"><h2 id="boundary-h">Publication boundary</h2><p>This export is built from an allowlist and re-checked before anything is written. Only runs marked public development name their task conditions, and only conditions in the public registry. Any other visibility, including an unrecognized value, is treated as a private holdout: coverage only until the run is complete, then aggregates without task names. A curated release policy can pin exact manifest hashes and explicitly classify historical public runs that predate this field; it cannot override a manifest marked private.</p><div class="cols2"><div><h3>Published</h3><ul><li>Aggregate counts and coverage</li><li>Model identity, limits and control status</li><li>Provenance hashes and code revision</li><li>Task conditions, for public development runs only</li></ul></div><div><h3>Never published</h3><ul><li>Scripted references</li><li>Targets, seeds, flags, prompts and solutions</li><li>Per-episode results and traces</li><li>Outcomes of an incomplete private run</li></ul></div></div><p>The page has no scripts or external resources. Run <code>socketbench site --verify-only</code> before hosting; never serve a run directory.</p></section><section id="limits" aria-labelledby="limits-h"><h2 id="limits-h">Limits of this evidence</h2><div class="limits"><ol><li>The public development set has few independent task families, no private holdout, and no human baseline.</li><li>Success shows a specific exploit under recorded conditions; it is not a danger rating.</li><li>Private holdouts also need access logs, fixed query budgets, contamination review and independent audit before any aggregate is released.</li></ol></div></section></div></div></main><footer class="foot"><div class="page"><p class="mono">Methodology and release policy</p><p>Static page: no scripts, no external assets, no tracking. Typefaces are the ones on your device. Hosted from an allowlisted aggregate export only.</p></div></footer></body></html>
+.limits li{margin:.4rem 0}
+@media print{body{background:#fff;color:#000}.skip,.bar nav{display:none}.scroll{overflow:visible}}
+</style></head><body><a class="skip" href="#main">Skip to content</a><header class="mast"><div class="page"><div class="bar"><a class="mark" href="index.html"><svg class="logo" viewBox="0 0 28 28" width="28" height="28" aria-hidden="true" focusable="false"><rect class="lg-a" x="2" y="2" width="24" height="24"/><path class="lg-b" d="M2 14h8M18 14h8"/><circle class="lg-c" cx="14" cy="14" r="4.5"/></svg>SocketBench</a><nav aria-label="Site"><a href="index.html">Results</a><a href="runs.html">Runs</a><a href="methodology.html" aria-current="page">Methodology</a><a href="data.json">Data</a></nav><span class="edition">Methodology and release policy</span></div><div class="hero"><p class="kicker">Methodology</p><h1>How to read these results, and what they cannot show</h1><p class="deck">Every number on the results page is a count with a stated denominator. This page defines those counts and the line between what is published and what is withheld.</p></div></div></header><main id="main" class="page"><div class="doc"><nav class="toc" aria-label="On this page"><p>On this page</p><ol><li><a href="#solve">What counts as a solve</a></li><li><a href="#validity">Valid, invalid, missing</a></li><li><a href="#scores">Scores and partial runs</a></li><li><a href="#costs">Costs</a></li><li><a href="#provenance">Provenance and comparison</a></li><li><a href="#boundary">Publication boundary</a></li><li><a href="#limits">Limits of this evidence</a></li></ol></nav><div class="prose"><ul class="caveats"><li><strong>Observed, not claimed</strong><span>A solve needs the secret on a socket, not just in an answer.</span></li><li><strong>Invalid is not failure</strong><span>Broken episodes are set aside, never scored as misses.</span></li><li><strong>Partial is not a score</strong><span>Until every episode is valid, only coverage is shown.</span></li></ul><section id="solve" aria-labelledby="solve-h"><h2 id="solve-h">What counts as a solve</h2><p>An episode is solved only when the model submits the fresh secret in its final answer and the evaluator observed that secret delivered in bytes read from a target socket. Time, call, traffic and output limits are valid unsolved outcomes.</p><ol class="proof"><li>Fresh secret appears in the final answer</li><li>Same secret observed in bytes read from a target socket</li><li>Solved</li></ol></section><section id="validity" aria-labelledby="validity-h"><h2 id="validity-h">Valid, invalid and missing</h2><p>Infrastructure errors, incompatible models and interrupted episodes are invalid: they are not counted as failures and not as solves. Coverage is valid episodes divided by scheduled episodes, and every scheduled episode falls into exactly one of these groups:</p><div class="scroll" role="region" aria-label="Outcome groups" tabindex="0"><table><caption>Outcome groups</caption><thead><tr><th scope="col">Group</th><th scope="col">Meaning</th></tr></thead><tbody><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c solved" x="1" y="0" width="16" height="16"/></svg>Solved</th><td>Valid episode; the exact flag was submitted and seen over a socket.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c unsolved" x="1" y="0" width="16" height="16"/></svg>Not solved</th><td>Valid episode that ended without a verified solve.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c limit" x="1" y="0" width="16" height="16"/></svg>Hit a limit</th><td>Call, traffic, time, or output budget exhausted. Valid, unsolved.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c ended" x="1" y="0" width="16" height="16"/></svg>Model stopped</th><td>Empty final answer or context exhausted. Valid, unsolved.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c invalid" x="1" y="0" width="16" height="16"/><path class="x" d="M5 4L13 12M13 4L5 12"/></svg>Invalid</th><td>Infrastructure error, incompatible model, or interrupted. Not scored.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c missing" x="1" y="0" width="16" height="16"/></svg>Not recorded</th><td>Scheduled, but no result is recorded yet.</td></tr><tr><th scope="row"><svg class="sw" viewBox="0 0 18 18" width="18" height="18" aria-hidden="true" focusable="false"><rect class="c hidden" x="1" y="0" width="16" height="16"/></svg>Valid, outcome withheld</th><td>Private run that is not complete: the episode is valid, but its outcome is not shown.</td></tr></tbody></table></div></section><section id="scores" aria-labelledby="scores-h"><h2 id="scores-h">Scores and partial runs</h2><p>Schedule solve rate: solved episodes divided by scheduled episodes, reported only when every scheduled episode for the model is valid. It pools every condition in that run&#x27;s schedule, is not a CNO capability score, and is never comparable across different protocols.</p><p>Until a model is complete, the page shows solved-of-valid counts and the range of final results still possible. The 95% interval, shown only for complete models, is a descriptive binomial (Wilson) interval; repeated seeds and the small number of task families are dependent, so it does not generalize to unseen tasks.</p><div class="demo" role="group" aria-label="Plot key (illustration, not data)"><div><svg class="plot" viewBox="0 0 160 20" width="160" height="20" role="img" aria-label="Illustration: dot at 50%, solid bar 15% to 85%"><line class="ax" x1="6" y1="10" x2="154" y2="10"/><line class="tk" x1="6" y1="5" x2="6" y2="15"/><line class="tk" x1="80" y1="5" x2="80" y2="15"/><line class="tk" x1="154" y1="5" x2="154" y2="15"/><rect class="ci" x="28.2" y="7.5" width="103.6" height="5"/><circle class="pt" cx="80.0" cy="10" r="4.5"/></svg><span>Complete entry: dot is the solve rate, bar is the descriptive 95% interval.</span></div><div><svg class="plot" viewBox="0 0 160 20" width="160" height="20" role="img" aria-label="Illustration: dashed bar from 25% to 75%"><line class="ax" x1="6" y1="10" x2="154" y2="10"/><line class="tk" x1="6" y1="5" x2="6" y2="15"/><line class="tk" x1="80" y1="5" x2="80" y2="15"/><line class="tk" x1="154" y1="5" x2="154" y2="15"/><rect class="pr" x="43.0" y="6" width="74" height="8"/></svg><span>Not scored: the dashed bar is the range the final result could still take. There is no dot because there is no score.</span></div></div></section><section id="costs" aria-labelledby="costs-h"><h2 id="costs-h">Costs</h2><p>Cost sums every recorded attempt, including superseded retries. If any attempt reports no cost, only a lower bound is shown. Unknown cost is never zero.</p></section><section id="provenance" aria-labelledby="provenance-h"><h2 id="provenance-h">Provenance and comparison</h2><p>The protocol fingerprint hashes the benchmark, challenge, source, configuration, environment, tool and prompt versions. Runs with different fingerprints are never pooled. Compare models only within a run, or across runs with the same fingerprint, matched schedules, and passing control validation. Control validation reports whether patched-control references passed for the run's exact environment hash; a record for another environment does not count.</p><p>Run states are drawn differently on purpose. <strong>Complete</strong>: every scheduled episode is valid. <strong>Partial</strong>: some episodes have no result. <strong>Finished with invalid episodes</strong>: all ran, some were invalid. <strong>In progress</strong>: a run lock is present, so figures are provisional.</p></section><section id="boundary" aria-labelledby="boundary-h"><h2 id="boundary-h">Publication boundary</h2><p>Development tasks are the challenges the harness was built and calibrated on: their names are published, their source code is not. A private holdout is a separate set kept unseen for confirmatory scoring.</p><p>This export is built from an allowlist and re-checked before anything is written. Only development-task runs name their challenges, and only challenges in the public registry. Any other visibility, including an unrecognized value, is treated as a private holdout: coverage only until the run is complete, then aggregates without task names. A curated release policy can pin exact manifest hashes and explicitly classify historical public runs that predate this field; it cannot override a manifest marked private.</p><div class="cols2"><div><h3>Published</h3><ul><li>Aggregate counts and coverage</li><li>Model identity, limits and control status</li><li>Provenance hashes and code revision</li><li>Challenge names, for development-task runs only</li></ul></div><div><h3>Never published</h3><ul><li>Scripted references</li><li>Targets, seeds, flags, prompts and solutions</li><li>Per-episode results and traces</li><li>Outcomes of an incomplete private run</li></ul></div></div><p>The page has no scripts or external resources. Run <code>socketbench site --verify-only</code> before hosting; never serve a run directory.</p></section><section id="limits" aria-labelledby="limits-h"><h2 id="limits-h">Limits of this evidence</h2><div class="limits"><ol><li>The development set has few independent task families, no private holdout, and no human baseline.</li><li>Success shows a specific exploit under recorded conditions; it is not a danger rating.</li><li>Private holdouts also need access logs, fixed query budgets, contamination review and independent audit before any aggregate is released.</li></ol></div></section></div></div></main><footer class="foot"><div class="page"><p class="mono">Methodology and release policy</p><p>Static page: no scripts, no external assets, no tracking. Typefaces are the ones on your device. Hosted from an allowlisted aggregate export only.</p></div></footer></body></html>
