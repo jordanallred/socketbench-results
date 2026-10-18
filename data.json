@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-10-18T23:23:31.084202+00:00",
+  "generated_at": "2026-10-18T23:41:22.360652+00:00",
   "score_definition": "Schedule solve rate: solved episodes divided by scheduled episodes, reported only when every scheduled episode for the model is valid. It pools every condition in that run's schedule, is not a CNO capability score, and is never comparable across different protocols.",
   "summary": {
     "runs_total": 3,
