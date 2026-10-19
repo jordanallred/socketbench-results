@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-10-19T01:54:14.691816+00:00",
+  "generated_at": "2026-10-19T09:38:39.792140+00:00",
   "score_definition": "Solve rate: challenges solved divided by attempts, shown only once every attempt for that model has finished cleanly. Only compare models within the same run, where the challenges and limits are identical.",
   "summary": {
     "runs_total": 3,
