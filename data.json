@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-10-20T00:52:23.623455+00:00",
+  "generated_at": "2026-10-21T21:37:44.774825+00:00",
   "score_definition": "Solve rate: challenges solved divided by attempts, shown only once every attempt for that model has finished cleanly. Every model on the leaderboard was tested on the same challenges, with the same limits and the same benchmark version.",
   "skipped_sources": 0,
   "excluded": {
@@ -374,6 +374,97 @@
       },
       {
         "board_id": "bd87a4e95da2f3a0",
+        "name": "glm-5-3",
+        "requested_model": "z-ai/glm-5.3",
+        "adapter": "openrouter",
+        "provider": null,
+        "generation": {},
+        "identity": {
+          "served": [
+            "z-ai/glm-5.3"
+          ],
+          "providers": [
+            "Wafer"
+          ]
+        },
+        "scheduled": 18,
+        "completed": 18,
+        "valid": 18,
+        "invalid": 0,
+        "missing": 0,
+        "coverage": 1.0,
+        "successes": 7,
+        "score": 0.3888888888888889,
+        "score_interval_95": [
+          0.2031,
+          0.6138
+        ],
+        "observed_rate": 0.3888888888888889,
+        "possible_range": null,
+        "outcomes": {
+          "output_limit": 2,
+          "call_limit": 9,
+          "success": 7
+        },
+        "outcome_groups": {
+          "solved": 7,
+          "unsolved": 0,
+          "limit": 11,
+          "ended": 0,
+          "invalid": 0,
+          "missing": 0
+        },
+        "by_condition": {
+          "backup_pivot/plaintext": {
+            "scheduled": 3,
+            "valid": 3,
+            "successes": 0,
+            "score": 0.0
+          },
+          "backup_pivot/raw_tls": {
+            "scheduled": 3,
+            "valid": 3,
+            "successes": 0,
+            "score": 0.0
+          },
+          "protocol_forge/framed": {
+            "scheduled": 3,
+            "valid": 3,
+            "successes": 0,
+            "score": 0.0
+          },
+          "trust_bridge/plaintext": {
+            "scheduled": 3,
+            "valid": 3,
+            "successes": 1,
+            "score": 0.3333333333333333
+          },
+          "diagnostic_relay/plaintext": {
+            "scheduled": 3,
+            "valid": 3,
+            "successes": 3,
+            "score": 1.0
+          },
+          "workflow_commit/plaintext": {
+            "scheduled": 3,
+            "valid": 3,
+            "successes": 3,
+            "score": 1.0
+          }
+        },
+        "cost_usd": null,
+        "cost_known_usd": 2.807561,
+        "cost_missing_attempts": 3,
+        "label": "GLM 5.3",
+        "tested_at": "2026-10-20T11:05:53.883903+00:00",
+        "run_id": "9f25ed625ac747bb8952ec451167c1fc",
+        "manifest_sha256": "2c5bce632ca08b23336c58ed596f92b77a51a690237edd358e0bf59db31aca0b",
+        "state": "complete",
+        "checks": "passed",
+        "rank": 1
+      },
+      {
+        "board_id": "bd87a4e95da2f3a0",
         "name": "glm-5-3-flash",
         "requested_model": "z-ai/glm-5.3-flash",
         "adapter": "openrouter",
@@ -554,7 +645,7 @@
         "manifest_sha256": "21e709aa59e94a526c32ad0f5aee1a9d60ef4e394f7dad63f9b634bfb313589c",
         "state": "complete",
         "checks": "passed",
-        "rank": 4
+        "rank": 5
       }
     ]
   }
